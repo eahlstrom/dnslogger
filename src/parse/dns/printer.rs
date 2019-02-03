@@ -21,7 +21,11 @@ pub(crate) struct ResourceRecordPrinter {
 
 impl ResourceRecordPrinter {
     pub fn from_rr(rr: &ResourceRecord) -> ResourceRecordPrinter {
-        let rrclass = format!("{:?}", rr.rrclass);
+        let rrclass = match rr.rrclass {
+            DnsClass::OtherUsage(_) => String::from("*"),
+            _ => format!("{:?}", rr.rrclass),
+        };
+
         let rrtype = format!("{:?}", rr.rrtype);
         let name: String = match &rr.name_chain.name {
             Some(name) => name.to_string(),
@@ -32,8 +36,6 @@ impl ResourceRecordPrinter {
             Some(record) => record,
             None => RRecordTypes::ParserNotImpl,
         };
-        // println!("{:?}", rdata);
-        // println!("{}", rdata);
 
         ResourceRecordPrinter {
             name,

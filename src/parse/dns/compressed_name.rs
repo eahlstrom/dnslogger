@@ -84,21 +84,27 @@ fn parse_compressed_token(i: &[u8]) -> IResult<&[u8], Option<CompressedName>> {
 
 pub(crate) fn parse_compressed_chain(i: &[u8]) -> IResult<&[u8], CompressedNameChain> {
     let mut names = CompressedNameChain::default();
-    let mut rest = i;
-    for _ in 0..100 {
-        let (i, name) = parse_compressed_token(rest)?;
-        rest = i;
-        match name {
-            Some(value) => {
-                names.push(value);
-                if let CompressedName::Pointer(_) = value {
-                    break;
+    if i[0] == 0u8 {
+        let (i, _) = take!(i, 1).unwrap();
+        names.name = Some(String::from("<ROOT>"));
+        value!(i, names)
+    } else {
+        let mut rest = i;
+        for _ in 0..100 {
+            let (i, name) = parse_compressed_token(rest)?;
+            rest = i;
+            match name {
+                Some(value) => {
+                    names.push(value);
+                    if let CompressedName::Pointer(_) = value {
+                        break;
+                    }
                 }
+                None => break,
             }
-            None => break,
         }
+        value!(rest, names)
     }
-    value!(rest, names)
 }
 
 #[cfg(test)]

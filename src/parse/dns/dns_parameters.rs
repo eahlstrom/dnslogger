@@ -116,7 +116,8 @@ named!(pub (crate) parse_dnstype<&[u8], DnsType>, do_parse!(
 #[derive(Clone, Debug, PartialEq, Serialize)]
 #[rustfmt::skip]
 pub enum DnsClass {
-    IN, CS, CH, HS, ALL, UnknownClass(u16),
+    IN, CS, CH, HS, ALL,
+    UnknownClass(u16), OtherUsage(u16),
 }
 
 #[rustfmt::skip]

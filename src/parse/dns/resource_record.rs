@@ -236,6 +236,98 @@ impl std::fmt::Display for SrvRecord {
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize)]
+pub struct OptionCookie {
+    client_cookie: String,
+    server_cookie: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize)]
+pub enum EdnsOption {
+    COOKIE(OptionCookie),
+    UnknownCode(u16),
+}
+
+pub(crate) fn parse_edns_option(i: &[u8]) -> IResult<&[u8], EdnsOption> {
+    let (i, code) = be_u16(i)?;
+    let (i, len) = be_u16(i)?;
+    let (i, data) = take!(i, len)?;
+
+    match code {
+        10 => {
+            let client_cookie = hex::encode(&data[0..8]);
+            let server_cookie = if data.len() >= 16 {
+                hex::encode(&data[8..16])
+            } else {
+                String::from("<MISSING>")
+            };
+            value!(
+                i,
+                EdnsOption::COOKIE(OptionCookie {
+                    client_cookie,
+                    server_cookie,
+                })
+            )
+        }
+        _ => value!(i, EdnsOption::UnknownCode(code)),
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize)]
+pub struct OptRecord {
+    udp_payload_size: u16,
+    e_rcode: u8,
+    version: u8,
+    opt_do: u8,
+    z: u16,
+    options: Vec<EdnsOption>,
+}
+
+impl OptRecord {
+    pub fn new(rr: &ResourceRecord, _full_dns_message: &[u8]) -> OptRecord {
+        let udp_payload_size = match rr.rrclass {
+            DnsClass::UnknownClass(udp_payload_size) => udp_payload_size,
+            _ => 0,
+        };
+        let e_rcode = ((rr.ttl >> 24) & 0xff) as u8;
+        let version = ((rr.ttl >> 16) & 0xff) as u8;
+        let opt_do = ((rr.ttl >> 15) & 1) as u8;
+        let z = (rr.ttl & 0x7fff) as u16;
+
+        let mut options = Vec::new();
+        let mut rest = rr.rdata;
+        for _ in 0..20 {
+            match parse_edns_option(rest) {
+                Ok((r, option)) => {
+                    options.push(option);
+                    if r.is_empty() {
+                        break;
+                    }
+                    rest = r;
+                }
+                Err(_) => {
+                    break;
+                }
+            }
+        }
+
+        OptRecord {
+            udp_payload_size,
+            e_rcode,
+            version,
+            opt_do,
+            z,
+            options,
+        }
+    }
+}
+
+impl std::fmt::Display for OptRecord {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "<ROOT>")
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct SoaRecord {
     mname: String,
     rname: String,
@@ -300,6 +392,7 @@ pub enum RRecordTypes {
     NS(NsRecord),
     SRV(SrvRecord),
     SOA(SoaRecord),
+    OPT(OptRecord),
     ParserNotImpl,
 }
 
@@ -315,6 +408,7 @@ impl std::fmt::Display for RRecordTypes {
             RRecordTypes::NS(v) => write!(f, "{}", v),
             RRecordTypes::SRV(v) => write!(f, "{}", v),
             RRecordTypes::SOA(v) => write!(f, "{}", v),
+            RRecordTypes::OPT(v) => write!(f, "{}", v),
             RRecordTypes::ParserNotImpl => write!(f, "ParserNotImpl"),
             // _ => write!(f, "RRtodo()"),
         }
@@ -367,6 +461,13 @@ impl<'a> ResourceRecord<'a> {
                 }
                 (DnsClass::IN, DnsType::SOA) => {
                     self.record = Some(RRecordTypes::SOA(SoaRecord::new(self, full_dns_message)));
+                }
+                (DnsClass::UnknownClass(len), DnsType::OPT) => {
+                    self.record = Some(RRecordTypes::OPT(OptRecord::new(
+                        self,
+                        full_dns_message,
+                    )));
+                    self.rrclass = DnsClass::OtherUsage(*len);
                 }
                 // (_, _) => self.record = Some(RRecordTypes::ParserNotImpl),
                 (cc, tt) => {
@@ -492,6 +593,32 @@ mod tests {
         ];
         let (_, v) = SoaRecord::parse_rdata(&rdata).unwrap();
         println!("SoaRecord::parse_rdata -> {:?}", v);
+    }
+
+    #[test]
+    fn test_edns_option_parser() {
+        let rdata: [u8; 12] = [
+            0x00, 0x0a, 0x00, 0x08, 0x8e, 0xa0, 0xf3, 0xd3, 0x6b, 0x19, 0x5c, 0xf7,
+        ];
+
+        let (r, edns_option) = parse_edns_option(&rdata).unwrap();
+        println!("{:?}", edns_option);
+        assert!(r.len() == 0);
+    }
+
+    #[test]
+    fn test_opt_record_parser() {
+        let rdata: [u8; 23] = [
+            0x00, 0x00, 0x29, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x00, 0x0a, 0x00,
+            0x08, 0x8e, 0xa0, 0xf3, 0xd3, 0x6b, 0x19, 0x5c, 0xf7,
+        ];
+
+        let (_, rr) = parse_resource_record(&rdata).unwrap();
+        assert_eq!(rr.rrtype, DnsType::OPT);
+
+        let v = OptRecord::new(&rr, &rdata);
+        println!("{:#?}", v);
+        assert_eq!(v.udp_payload_size, 4096);
     }
 
 }
