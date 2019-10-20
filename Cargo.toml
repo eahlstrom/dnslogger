@@ -16,7 +16,7 @@ edition = "2018"
 
 [dependencies]
 pcap = "0.7.0"
-pnet = "0.21.0"
+pnet = "0.22.0"
 nom = "4.1.1"
 structopt = "0.2.14"
 clap = "2.32.0"
