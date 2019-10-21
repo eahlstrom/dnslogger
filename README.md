@@ -16,7 +16,7 @@ cargo build --release && cargo install --path .
 ## Usage
 <pre>
 $ dnslogger --help
-dnslogger 0.1.0
+dnslogger 0.1.1
 Erik Ahlström <ea@negahok.se>
 Passive dns sniffer. Provides dnslogger binary and a dns parser library.
 
@@ -39,7 +39,7 @@ ARGS:
 
 <pre>
 $ dnslogger -r fixtures/dns/dns.pcap 
-1112172466.496576  UDP     192.168.170.20:53 -> 192.168.170.8:32795     4146   Query/Response   NoError   		q:|IN/TXT/google.com|                  	a:|IN/270/TXT/google.com("v=spf1 ptr ?all")|
+1112172466.496576  UDP     192.168.170.20:53 -> 192.168.170.8:32795     4146   Query/Response   NoError         q:|IN/TXT/google.com|                   a:|IN/270/TXT/google.com("v=spf1 ptr ?all")|
 ...
 </pre>
 
