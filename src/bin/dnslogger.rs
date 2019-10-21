@@ -1,4 +1,4 @@
-use clap::{_clap_count_exprs, arg_enum};
+use clap::arg_enum;
 use dnslogger::parse::dns::PacketPrinter;
 use log::{debug, info};
 use pcap::Capture;
