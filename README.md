@@ -6,7 +6,7 @@ Passive dns sniffer. Provides dnslogger binary and a dns parser library.
 Before installing make sure you have: libpcap-dev
 
 <pre>
-cargo install dnslogger
+cargo install dnslogger --locked
 </pre>
 _or_
 <pre>
