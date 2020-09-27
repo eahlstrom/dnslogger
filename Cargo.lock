@@ -57,7 +57,7 @@ dependencies = [
 
 [[package]]
 name = "dnslogger"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "clap 2.33.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "env_logger 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",

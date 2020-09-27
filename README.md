@@ -16,7 +16,7 @@ cargo build --release && cargo install --path .
 ## Usage
 <pre>
 $ dnslogger --help
-dnslogger 0.1.1
+dnslogger 0.1.3
 Erik Ahlström <ea@negahok.se>
 Passive dns sniffer. Provides dnslogger binary and a dns parser library.
 

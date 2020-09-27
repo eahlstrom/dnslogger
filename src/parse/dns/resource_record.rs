@@ -20,7 +20,7 @@ impl MxRecord {
     pub fn new(rr: &ResourceRecord, full_dns_message: &[u8]) -> MxRecord {
         let (_, (preference, mut name_chain)) = Self::parse_rdata(rr.rdata).unwrap();
         let exchange = match name_chain.resolve_name(0, full_dns_message) {
-            Some(n) => n.to_owned().to_string(),
+            Some(n) => n.to_owned(),
             None => String::new(),
         };
         MxRecord {
@@ -96,7 +96,7 @@ impl PtrRecord {
     pub fn new(rr: &ResourceRecord, full_dns_message: &[u8]) -> PtrRecord {
         let (_, mut name_chain) = Self::parse_rdata(rr.rdata).unwrap();
         let name = match name_chain.resolve_name(0, full_dns_message) {
-            Some(n) => n.to_owned().to_string(),
+            Some(n) => n.to_string(),
             None => String::new(),
         };
         PtrRecord { name }
@@ -153,7 +153,7 @@ impl CNameRecord {
     pub fn new(rr: &ResourceRecord, full_dns_message: &[u8]) -> CNameRecord {
         let (_, mut name_chain) = Self::parse_rdata(rr.rdata).unwrap();
         let name = match name_chain.resolve_name(0, full_dns_message) {
-            Some(n) => n.to_owned().to_string(),
+            Some(n) => n.to_string(),
             None => String::new(),
         };
         CNameRecord { name }
@@ -180,7 +180,7 @@ impl NsRecord {
     pub fn new(rr: &ResourceRecord, full_dns_message: &[u8]) -> NsRecord {
         let (_, mut name_chain) = Self::parse_rdata(rr.rdata).unwrap();
         let name = match name_chain.resolve_name(0, full_dns_message) {
-            Some(n) => n.to_owned().to_string(),
+            Some(n) => n.to_owned(),
             None => String::new(),
         };
         NsRecord { name }
@@ -213,7 +213,7 @@ impl SrvRecord {
     pub fn new(rr: &ResourceRecord, full_dns_message: &[u8]) -> SrvRecord {
         let (_, (prio, weight, port, mut target_chain)) = Self::parse_rdata(rr.rdata).unwrap();
         let target = match target_chain.resolve_name(0, full_dns_message) {
-            Some(n) => n.to_owned().to_string(),
+            Some(n) => n.to_string(),
             None => String::new(),
         };
         SrvRecord {
@@ -352,11 +352,11 @@ impl SoaRecord {
         let (_, (mut mname_chain, mut rname_chain, serial, refresh, retry, expire)) =
             Self::parse_rdata(rr.rdata).unwrap();
         let mname = match mname_chain.resolve_name(0, full_dns_message) {
-            Some(n) => n.to_owned().to_string(),
+            Some(n) => n.to_string(),
             None => String::new(),
         };
         let rname = match rname_chain.resolve_name(0, full_dns_message) {
-            Some(n) => n.to_owned().to_string(),
+            Some(n) => n.to_string(),
             None => String::new(),
         };
 

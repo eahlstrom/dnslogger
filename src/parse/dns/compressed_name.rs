@@ -25,7 +25,7 @@ impl<'a> CompressedNameChain<'a> {
                 let mut values: Vec<String> = Vec::new();
                 for token in self.tokens.iter() {
                     match token {
-                        CompressedName::Label(name) => values.push(name.to_string()),
+                        CompressedName::Label(name) => values.push((*name).to_string()),
                         CompressedName::Pointer(offs) => {
                             let offs = *offs as usize;
                             if let Ok((_, mut name_chain)) =
