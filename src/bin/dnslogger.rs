@@ -55,7 +55,7 @@ fn setup_logging(loglevel: u8) {
                 3 => "dnslogger=debug,parse=debug",
                 _ => "debug",
             };
-            if loglevel != "" {
+            if !loglevel.is_empty() {
                 env::set_var("RUST_LOG", loglevel);
             }
         }
@@ -64,7 +64,7 @@ fn setup_logging(loglevel: u8) {
 }
 
 fn handle_packet(packet: &pcap::Packet, output_format: &OutputFormat) {
-    if let Some(packet_printer) = PacketPrinter::parse_packet(&packet) {
+    if let Some(packet_printer) = PacketPrinter::parse_packet(packet) {
         debug!("{:#?}", packet_printer);
         match output_format {
             OutputFormat::Text => println!("{}", packet_printer),

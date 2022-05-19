@@ -141,25 +141,25 @@ impl PacketPrinter {
 
         let mut queries: PrinterVec<QueryPrinter> = PrinterVec(Vec::new());
         for q in dns.queries.iter() {
-            let qp = QueryPrinter::from_query(&q);
+            let qp = QueryPrinter::from_query(q);
             queries.0.push(qp);
         }
 
         let mut answers: PrinterVec<ResourceRecordPrinter> = PrinterVec(Vec::new());
         for rr in dns.answers.iter() {
-            let rp = ResourceRecordPrinter::from_rr(&rr);
+            let rp = ResourceRecordPrinter::from_rr(rr);
             answers.0.push(rp);
         }
 
         let mut nsrecords: PrinterVec<ResourceRecordPrinter> = PrinterVec(Vec::new());
         for rr in dns.nsrecords.iter() {
-            let rp = ResourceRecordPrinter::from_rr(&rr);
+            let rp = ResourceRecordPrinter::from_rr(rr);
             nsrecords.0.push(rp);
         }
 
         let mut arecords: PrinterVec<ResourceRecordPrinter> = PrinterVec(Vec::new());
         for rr in dns.arecords.iter() {
-            let rp = ResourceRecordPrinter::from_rr(&rr);
+            let rp = ResourceRecordPrinter::from_rr(rr);
             arecords.0.push(rp);
         }
 
@@ -209,6 +209,7 @@ impl PacketPrinter {
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 impl std::fmt::Display for PacketPrinter {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
