@@ -1,19 +1,19 @@
 use nom::*;
 use serde_derive::Serialize;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 #[rustfmt::skip]
 pub enum Qr {
     Query, Response,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 #[rustfmt::skip]
 pub enum Opcode {
     Query, IQuery, Status, Reserved,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 #[rustfmt::skip]
 pub enum Rcode {
     NoError, FormErr, ServFail, NXDomain,
@@ -21,7 +21,7 @@ pub enum Rcode {
     NotAuth, NotZone, Other(u8),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Flags {
     pub qr: Qr,
     pub opcode: Opcode,
@@ -73,7 +73,7 @@ pub(crate) fn parse_flags(i: &[u8]) -> IResult<&[u8], Flags> {
     value!(i, flags)
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 #[rustfmt::skip]
 pub enum DnsType {
     A, NS, CNAME, SOA, WKS, PTR, HINFO, MX, TXT, AXFR, ALL,
@@ -113,7 +113,7 @@ named!(pub (crate) parse_dnstype<&[u8], DnsType>, do_parse!(
     })
 ));
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 #[rustfmt::skip]
 pub enum DnsClass {
     IN, CS, CH, HS, ALL,

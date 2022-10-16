@@ -1,7 +1,7 @@
 use crate::parse::dns::*;
 use nom::*;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct DnsHeader {
     pub id: u16,
     pub flags: Flags,
@@ -24,7 +24,7 @@ named!(parse_dns_header<&[u8], DnsHeader>, do_parse!(
     )
 ));
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct DnsMessage<'a> {
     pub header: DnsHeader,
     pub queries: Vec<Query<'a>>,
@@ -76,7 +76,7 @@ mod tests {
 
     #[test]
     fn test_parse_dns_message() {
-        let (_res, mut dns_message) = parse_dns_message(&DNS_RESPONSE).unwrap();
+        let (_res, mut dns_message) = parse_dns_message(DNS_RESPONSE).unwrap();
         println!("{:?}", dns_message);
         assert_eq!(dns_message.header.id, 63343);
         assert_eq!(dns_message.header.qdcount, 1);
@@ -87,26 +87,26 @@ mod tests {
         println!("--");
         println!("Queries:");
         for (i, anrr) in dns_message.queries.iter_mut().enumerate() {
-            anrr.name_chain.resolve_name(0, &DNS_RESPONSE);
+            anrr.name_chain.resolve_name(0, DNS_RESPONSE);
             println!("  {}: {:?}", i, anrr);
         }
 
         println!("Answers:");
         for (i, anrr) in dns_message.answers.iter_mut().enumerate() {
-            anrr.resolve(&DNS_RESPONSE);
+            anrr.resolve(DNS_RESPONSE);
             println!("  {}: {:?}", i, anrr);
         }
 
         println!("Additional records:");
         for (i, anrr) in dns_message.arecords.iter_mut().enumerate() {
-            anrr.resolve(&DNS_RESPONSE);
+            anrr.resolve(DNS_RESPONSE);
             println!("  {}: {:?}", i, anrr);
         }
     }
 
     #[test]
     fn test_dns_message() {
-        let (_rest, dns_message) = dns_message(&DNS_RESPONSE, true).unwrap();
+        let (_rest, dns_message) = dns_message(DNS_RESPONSE, true).unwrap();
         println!("{:#x?}", dns_message);
         assert_eq!(dns_message.header.arcount, 6);
         let should_be = Some("smtp3.google.com".to_string());
@@ -119,7 +119,6 @@ mod tests {
         let dns_data: &[u8] = include_bytes!("../../../fixtures/dns/dns_looping_pointer.bin");
         let (_rest, dns_message) = dns_message(dns_data, false).unwrap();
         println!("{:?}", dns_message);
-        assert!(true);
     }
 
 }

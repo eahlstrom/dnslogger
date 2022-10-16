@@ -3,7 +3,7 @@ use nom::*;
 
 const RESOLVE_NAME_RECURSION_MAX: usize = 10;
 
-#[derive(Clone, Debug, PartialEq, Default)]
+#[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub struct CompressedNameChain<'a> {
     pub name: Option<String>,
     tokens: Vec<CompressedName<'a>>,
@@ -50,7 +50,7 @@ impl<'a> CompressedNameChain<'a> {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Copy)]
+#[derive(Clone, Debug, PartialEq, Eq, Copy)]
 pub enum CompressedName<'a> {
     Label(&'a str),
     Pointer(u16),
@@ -131,7 +131,7 @@ mod tests {
         cn.push(CompressedName::Label(&l2));
         cn.push(CompressedName::Pointer(12));
 
-        let name = cn.resolve_name(0, &DNS_RESPONSE);
+        let name = cn.resolve_name(0, DNS_RESPONSE);
         let should_be = &Some("host.subdomain.google.com".to_string());
         assert_eq!(should_be, name);
     }
@@ -144,7 +144,7 @@ mod tests {
 
         let (rest, mut nc) = parse_compressed_chain(&data).unwrap();
         println!("{:?}", nc);
-        let name = nc.resolve_name(0, &DNS_RESPONSE);
+        let name = nc.resolve_name(0, DNS_RESPONSE);
         let should_be: &Option<String> = &Some("google.com".to_string());
         assert_eq!(should_be, name);
         assert_eq!(0, rest.len(), "should eat nullbyte at end");

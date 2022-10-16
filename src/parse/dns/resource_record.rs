@@ -4,7 +4,7 @@ use nom::*;
 use serde_derive::Serialize;
 use std::net::{Ipv4Addr, Ipv6Addr};
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct MxRecord {
     pub preference: u16,
     pub exchange: String,
@@ -36,7 +36,7 @@ impl std::fmt::Display for MxRecord {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct ARecord {
     address: Ipv4Addr,
 }
@@ -59,7 +59,7 @@ impl std::fmt::Display for ARecord {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct AAAARecord {
     address: Ipv6Addr,
 }
@@ -82,7 +82,7 @@ impl std::fmt::Display for AAAARecord {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct PtrRecord {
     name: String,
 }
@@ -109,7 +109,7 @@ impl std::fmt::Display for PtrRecord {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct TxtRecord {
     len: u8,
     bytes: Vec<u8>,
@@ -139,7 +139,7 @@ impl std::fmt::Display for TxtRecord {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct CNameRecord {
     name: String,
 }
@@ -166,7 +166,7 @@ impl std::fmt::Display for CNameRecord {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct NsRecord {
     name: String,
 }
@@ -193,7 +193,7 @@ impl std::fmt::Display for NsRecord {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct SrvRecord {
     prio: u16,
     weight: u16,
@@ -235,13 +235,13 @@ impl std::fmt::Display for SrvRecord {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct OptionCookie {
     client_cookie: String,
     server_cookie: String,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub enum EdnsOption {
     COOKIE(OptionCookie),
     UnknownCode(u16),
@@ -272,7 +272,7 @@ pub(crate) fn parse_edns_option(i: &[u8]) -> IResult<&[u8], EdnsOption> {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct OptRecord {
     udp_payload_size: u16,
     e_rcode: u8,
@@ -327,7 +327,7 @@ impl std::fmt::Display for OptRecord {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct SoaRecord {
     mname: String,
     rname: String,
@@ -381,7 +381,7 @@ impl std::fmt::Display for SoaRecord {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub enum RRecordTypes {
     MX(MxRecord),
     A(ARecord),
@@ -415,7 +415,7 @@ impl std::fmt::Display for RRecordTypes {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct ResourceRecord<'a> {
     pub name_chain: CompressedNameChain<'a>,
     pub rrtype: DnsType,
@@ -517,7 +517,6 @@ mod tests {
         let rdata: [u8; 10] = [0, 40, 5, 115, 109, 116, 112, 52, 192, 12];
         let (_, v) = MxRecord::parse_rdata(&rdata).unwrap();
         println!("MxRecord::parse_rdata -> {:?}", v);
-        assert!(true);
     }
 
     #[test]
@@ -603,7 +602,7 @@ mod tests {
 
         let (r, edns_option) = parse_edns_option(&rdata).unwrap();
         println!("{:?}", edns_option);
-        assert!(r.len() == 0);
+        assert!(r.is_empty());
     }
 
     #[test]

@@ -1,7 +1,7 @@
 use crate::parse::dns::*;
 use nom::*;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Query<'a> {
     pub name_chain: CompressedNameChain<'a>,
     pub qtype: DnsType,
