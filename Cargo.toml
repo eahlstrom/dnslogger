@@ -14,7 +14,7 @@ readme = "README.md"
 edition = "2018"
 
 [dependencies.pnet]
-version = "0.26.0"
+version = "0.31.0"
 
 [dependencies]
 pcap = "0.11.0"
