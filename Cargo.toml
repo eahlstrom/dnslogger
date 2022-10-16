@@ -1,6 +1,6 @@
 [package]
 name = "dnslogger"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Erik Ahlström <ea@negahok.se>"]
 description = """
 Passive dns sniffer. Provides dnslogger binary and a dns parser library.
@@ -17,7 +17,7 @@ edition = "2018"
 version = "0.26.0"
 
 [dependencies]
-pcap = "0.9.0"
+pcap = "0.11.0"
 nom = "4.1.1"
 structopt = "0.2.14"
 clap = "2.32.0"

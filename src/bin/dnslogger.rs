@@ -81,8 +81,8 @@ fn main() {
     if let Some(pcap_file) = opts.pcap_file {
         info!("using pcap file {}", pcap_file);
         let mut cap = Capture::from_file(pcap_file).unwrap();
-        cap.filter(&opts.bpf_expression[..]).unwrap();
-        while let Ok(packet) = cap.next() {
+        cap.filter(&opts.bpf_expression[..], true).unwrap();
+        while let Ok(packet) = cap.next_packet() {
             handle_packet(&packet, &opts.output_format);
         }
     } else if let Some(interface) = opts.interface {
@@ -93,8 +93,8 @@ fn main() {
             .snaplen(0)
             .open()
             .unwrap();
-        cap.filter(&opts.bpf_expression[..]).unwrap();
-        while let Ok(packet) = cap.next() {
+        cap.filter(&opts.bpf_expression[..], true).unwrap();
+        while let Ok(packet) = cap.next_packet() {
             handle_packet(&packet, &opts.output_format);
         }
     } else {

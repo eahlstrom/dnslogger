@@ -253,11 +253,11 @@ mod tests {
     #[test]
     fn test_print_text() {
         let mut cap = pcap::Capture::from_file("fixtures/dns/dns.pcap").unwrap();
-        cap.filter(BPF).unwrap();
+        cap.filter(BPF, true).unwrap();
         for i in 1..PKTNO {
-            cap.next().expect(&format!("failed to get packet {}!", i));
+            cap.next_packet().expect(&format!("failed to get packet {}!", i));
         }
-        let pcap_pkt = cap.next().expect("failed to get packet!");
+        let pcap_pkt = cap.next_packet().expect("failed to get packet!");
         if let Some(packet_printer) = PacketPrinter::parse_packet(&pcap_pkt) {
             println!("{}", packet_printer);
             assert!(true);
@@ -269,11 +269,11 @@ mod tests {
     #[test]
     fn test_print_json() {
         let mut cap = pcap::Capture::from_file("fixtures/dns/dns.pcap").unwrap();
-        cap.filter(BPF).unwrap();
+        cap.filter(BPF, true).unwrap();
         for i in 1..PKTNO {
-            cap.next().expect(&format!("failed to get packet {}!", i));
+            cap.next_packet().expect(&format!("failed to get packet {}!", i));
         }
-        let pcap_pkt = cap.next().expect("failed to get packet!");
+        let pcap_pkt = cap.next_packet().expect("failed to get packet!");
         if let Some(packet_printer) = PacketPrinter::parse_packet(&pcap_pkt) {
             println!("{}", packet_printer.to_json().unwrap());
             assert!(true);
